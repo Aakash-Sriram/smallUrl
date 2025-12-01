@@ -1,25 +1,36 @@
-version: "3.8"
-
 services:
+
   redis:
     image: "redis:latest"
     container_name: "redis"
-    ports:
-      - "6379:6379"
+    expose:
+      - "6379"
     volumes:
       - redis-data:/data
 
   app:
     build: .
     container_name: url-app
-    ports:
-      - "9808:9808"
+    expose: 
+      - "9808"
     environment:
       BASE_URL: "http://localhost:9808"
       REDIS_ADDR: "redis:6379"
       PORT: "9808"
     depends_on:
       - redis
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    ports: 
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/default.conf:ro,Z
+      - ./frontend/dist:/usr/share/nginx/html:ro,Z
+    depends_on:
+      - app
     restart: unless-stopped
 
 volumes:

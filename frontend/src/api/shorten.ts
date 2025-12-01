@@ -1,4 +1,3 @@
-import 'dotenv'
 export async function getLongUrl(longUrl:string):Promise<{shortUrl:string}>{
     const url = import.meta.env.VITE_SMALL_URL;
 
