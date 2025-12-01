@@ -35,7 +35,7 @@ func main() {
 		port = "9808"
 	}
 	if base == "" {
-		base = fmt.Sprintf("http://localhost:%s", port)
+		base = "http://localhost"
 	}
 	//==============================================
 	//==============================================
