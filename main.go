@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"os"
 
@@ -32,7 +33,7 @@ func main() {
 
 	r.POST("/shorten", tinyUrl)
 
-	r.POST("/:id", redirectHandler)
+	r.GET("/:id", redirectHandler)
 	err := r.Run(":9808")
 	if err != nil {
 		panic(fmt.Sprintf("Failed to start the web server - Error: %v", err))
@@ -48,15 +49,23 @@ type Request struct {
 
 func tinyUrl(c *gin.Context) {
 	var body Request
-	if err := c.ShouldBindJSON(&body); err != nil {
+	if err1 := c.ShouldBindJSON(&body); err1 != nil {
 		c.JSON(400, gin.H{"error": "Invalid request body"})
 		return
 	}
 
-	slug, err := SecureRandomString(8)
-	if err != nil {
+	rdb := setUpRedisClient()
+
+	slug, err2 := SecureRandomString(8)
+	if err2 != nil {
 		c.JSON(500, gin.H{"error": "Failed to generate slug"})
 		return
+	}
+	ctx := c.Request.Context()
+	ttl := time.Hour * 24
+	err3 := rdb.Set(ctx, slug, body.URL, ttl)
+	if err3.Err() != nil {
+		c.JSON(500, gin.H{"error": "Failed to add to redis"})
 	}
 	c.JSON(200, gin.H{"shortUrl": slug})
 
