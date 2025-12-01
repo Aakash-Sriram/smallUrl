@@ -8,3 +8,4 @@ vendor
 *.so
 *.dylib
 node_modules
+frontend/
