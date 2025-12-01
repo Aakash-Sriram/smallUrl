@@ -1,0 +1,10 @@
+
+bin
+*.log
+vendor
+.git
+*.exe
+*.dll
+*.so
+*.dylib
+node_modules
